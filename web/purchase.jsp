@@ -7,6 +7,7 @@
 <%@page contentType="text/html" pageEncoding="UTF-8"%>
 <%@page import="java.sql.*"%>
 <%@page import="java.util.*"%>
+<%@page import="cn.vo.Product,cn.factory.DAOFactory" %>
 <!DOCTYPE html>
 <html>
     <head>
@@ -15,27 +16,31 @@
     </head>
     <body>
         <%
-            if(session.getAttribute("mid")!=null|| !(request.getParameter("uname")!=null && request.getParameter("upass")!=null))
+            System.out.println(session.getAttribute("mid"));
+            System.out.println(request.getParameter("uname"));
+            System.out.println(request.getParameter("upass"));
+            
+            
+            if(session.isNew())
             {
-                System.out.println((String)session.getAttribute("mid"));
-                System.out.println(request.getParameter("uname"));
-                System.out.println(request.getParameter("upass"));
-            }else
+                response.sendRedirect("login.jsp");
+            }
+            
+            if(session.getAttribute("mid")==null&&(request.getParameter("uname")==null || request.getParameter("upass")==null))
             {
+                System.out.println("in verify snippet");
+                
+                %>
+                
+                 <jsp:forward page="login.jsp" />
+                <%
                 response.sendRedirect("login.jsp");
             }
             
             if(request.getParameter("item")!=null)
             {
                 Cookie[] ck=request.getCookies();
-                int len=ck.length;
-                
-                for(int i=0;i<len;i++)
-                {
-                    System.out.println(ck[i].getName());
-                    System.out.println(ck[i].getValue());
-                    
-                }
+                int len=ck.length;                
                 
                 boolean flag=false;
                 for(int i=0;i<len;i++)
@@ -62,85 +67,34 @@
             }
         %>
         
-        <%!
-            public static final String DBDRIVER="org.mariadb.jdbc.Driver";
-            public static final String DBURL="jdbc:mariadb://localhost:3306/mldn";
-            public static final String DBUSER="blocksmz";
-            public static final String DBPASS="MRZHAo0928";
 
-            class goods{
-            
-            int id;
-            String name;
-            String note;
-            double price;
-            int amount;
-            }
-        %>
-        
         <%
-            LinkedList<goods> cont=new LinkedList<goods>();
+            LinkedList<Product> cont=null;
             int count=0;
-            Connection con=null;
-            PreparedStatement stmt=null;
-            ResultSet rs=null;
             
         %>
         
         <%
-            try{
-                
-                Class.forName(DBDRIVER);
-                con=DriverManager.getConnection(DBURL,DBUSER,DBPASS);
-                
-                String sql1="select name from member where mid='"+request.getParameter("uname")+"' and password='"+request.getParameter("upass")+"'";
-                
-                stmt=con.prepareStatement(sql1);
-                rs=stmt.executeQuery();
-                
-                if(rs==null)
-                {
-                    response.sendRedirect("login.jsp");
-                }
-                
-                if(rs.next())
-                {
-                    session.setAttribute("mid",rs.getString(1)); 
-                }
-                
-                
-                String sql2="select pid,name,note,price,amount from product";
-                
-                stmt=con.prepareStatement(sql2);
-                
-                rs=stmt.executeQuery();
-                
-                
-                
-                while(rs.next())
-                {
-                    goods foradd=new goods();
-                    foradd.id=rs.getInt(1);
-                    foradd.name=rs.getString(2);
-                    foradd.note=rs.getString(3);
-                    foradd.price=rs.getDouble(4);
-                    foradd.amount=rs.getInt(5);
-                    
-                    cont.add(foradd);
-                    count++;
-            
-                }
-                
-                rs.close();
-                stmt.close();
-                con.close();
-            }
-            catch(Exception e)
+            if(session.getAttribute("mid")==null)
             {
-                e.printStackTrace();
+                String name=null;
+                name=DAOFactory.getIProductDAOInstance().getByUPass(request.getParameter("uname"),request.getParameter("upass"));
+                if(name==null)
+                {
+        %>
+        <jsp:forward page="login.jsp" />
+        <%
+//                    <!--response.sendRedirect("login.jsp");-->
+                }
+                else{
+                    session.setAttribute("mid",name);
+                }
             }
             
             
+            cont=DAOFactory.getIProductDAOInstance().getAll();
+            count=cont.size();
+
         %>
         
         <%
@@ -165,17 +119,12 @@
             {
                 after=npage+1;
             }
-            System.out.println("npage:"+npage);
-            System.out.println("start:"+start);
-            System.out.println("end:"+end);
-            System.out.println("after:"+after);
-            System.out.println("count:"+count);
-           
-
         %>
+        
         <div style="width:100%;height:80%;">
          <table>
             <tr>
+                <td>商品参考</td>
                 <td>
                     商品id
                 </td>
@@ -208,7 +157,7 @@
                 {
                     break;
                 }
-                goods np=cont.get(npage*5+ncount);
+                Product np=cont.get(npage*5+ncount);
                 
                  System.out.println("ncount:"+ncount);
                  ncount++;
@@ -216,15 +165,19 @@
 
        
             <tr>
-                <td><%=np.id%></td>
+                <td><img src="<%=np.photo%>" style="height:150px;width:200px;"></td>
+                <td><%=np.pid%></td>
                 <td><%=np.name%></td>
                 <td><%=np.note%></td>
                 <td><%=np.price%></td>
                 <td><%=np.amount%></td>
-                <td><a style="float:right;" href="purchase.jsp?item=<%=np.id%>&tpage=<%=npage%>">加入购物车</a></td>
+                <td><a style="float:right;" href="purchase.jsp?item=<%=np.pid%>&tpage=<%=npage%>">加入购物车</a></td>
             </tr>
         
         <%
+            System.out.println(np.name);
+            System.out.println("np.photo: link"+np.photo);
+            
             }
         %>
         </table>

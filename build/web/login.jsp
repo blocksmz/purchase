@@ -40,7 +40,6 @@
 
                         <input type="reset" value="重置">
         </form>
-
     </center>
     </body>
 </html>

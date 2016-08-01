@@ -5,25 +5,12 @@ import javax.servlet.http.*;
 import javax.servlet.jsp.*;
 import java.sql.*;
 import java.util.*;
+import cn.vo.Product;
+import cn.factory.DAOFactory;
 
 public final class purchase_jsp extends org.apache.jasper.runtime.HttpJspBase
     implements org.apache.jasper.runtime.JspSourceDependent {
 
-
-            public static final String DBDRIVER="org.mariadb.jdbc.Driver";
-            public static final String DBURL="jdbc:mariadb://localhost:3306/mldn";
-            public static final String DBUSER="blocksmz";
-            public static final String DBPASS="MRZHAo0928";
-
-            class goods{
-            
-            int id;
-            String name;
-            String note;
-            double price;
-            int amount;
-            }
-        
   private static final JspFactory _jspxFactory = JspFactory.getDefaultFactory();
 
   private static java.util.List<String> _jspx_dependants;
@@ -63,6 +50,7 @@ public final class purchase_jsp extends org.apache.jasper.runtime.HttpJspBase
       out.write("\n");
       out.write("\n");
       out.write("\n");
+      out.write("\n");
       out.write("<!DOCTYPE html>\n");
       out.write("<html>\n");
       out.write("    <head>\n");
@@ -72,27 +60,38 @@ public final class purchase_jsp extends org.apache.jasper.runtime.HttpJspBase
       out.write("    <body>\n");
       out.write("        ");
 
-            if(session.getAttribute("mid")!=null|| !(request.getParameter("uname")!=null && request.getParameter("upass")!=null))
+            System.out.println(session.getAttribute("mid"));
+            System.out.println(request.getParameter("uname"));
+            System.out.println(request.getParameter("upass"));
+            
+            
+            if(session.isNew())
             {
-                System.out.println((String)session.getAttribute("mid"));
-                System.out.println(request.getParameter("uname"));
-                System.out.println(request.getParameter("upass"));
-            }else
+                response.sendRedirect("login.jsp");
+            }
+            
+            if(session.getAttribute("mid")==null&&(request.getParameter("uname")==null || request.getParameter("upass")==null))
             {
+                System.out.println("in verify snippet");
+                
+                
+      out.write("\n");
+      out.write("                \n");
+      out.write("                 ");
+      if (true) {
+        _jspx_page_context.forward("login.jsp");
+        return;
+      }
+      out.write("\n");
+      out.write("                ");
+
                 response.sendRedirect("login.jsp");
             }
             
             if(request.getParameter("item")!=null)
             {
                 Cookie[] ck=request.getCookies();
-                int len=ck.length;
-                
-                for(int i=0;i<len;i++)
-                {
-                    System.out.println(ck[i].getName());
-                    System.out.println(ck[i].getValue());
-                    
-                }
+                int len=ck.length;                
                 
                 boolean flag=false;
                 for(int i=0;i<len;i++)
@@ -120,75 +119,44 @@ public final class purchase_jsp extends org.apache.jasper.runtime.HttpJspBase
         
       out.write("\n");
       out.write("        \n");
-      out.write("        ");
       out.write("\n");
-      out.write("        \n");
       out.write("        ");
 
-            LinkedList<goods> cont=new LinkedList<goods>();
+            LinkedList<Product> cont=null;
             int count=0;
-            Connection con=null;
-            PreparedStatement stmt=null;
-            ResultSet rs=null;
             
         
       out.write("\n");
       out.write("        \n");
       out.write("        ");
 
-            try{
-                
-                Class.forName(DBDRIVER);
-                con=DriverManager.getConnection(DBURL,DBUSER,DBPASS);
-                
-                String sql1="select name from member where mid='"+request.getParameter("uname")+"' and password='"+request.getParameter("upass")+"'";
-                
-                stmt=con.prepareStatement(sql1);
-                rs=stmt.executeQuery();
-                
-                if(rs==null)
-                {
-                    response.sendRedirect("login.jsp");
-                }
-                
-                if(rs.next())
-                {
-                    session.setAttribute("mid",rs.getString(1)); 
-                }
-                
-                
-                String sql2="select pid,name,note,price,amount from product";
-                
-                stmt=con.prepareStatement(sql2);
-                
-                rs=stmt.executeQuery();
-                
-                
-                
-                while(rs.next())
-                {
-                    goods foradd=new goods();
-                    foradd.id=rs.getInt(1);
-                    foradd.name=rs.getString(2);
-                    foradd.note=rs.getString(3);
-                    foradd.price=rs.getDouble(4);
-                    foradd.amount=rs.getInt(5);
-                    
-                    cont.add(foradd);
-                    count++;
-            
-                }
-                
-                rs.close();
-                stmt.close();
-                con.close();
-            }
-            catch(Exception e)
+            if(session.getAttribute("mid")==null)
             {
-                e.printStackTrace();
+                String name=null;
+                name=DAOFactory.getIProductDAOInstance().getByUPass(request.getParameter("uname"),request.getParameter("upass"));
+                if(name==null)
+                {
+        
+      out.write("\n");
+      out.write("        ");
+      if (true) {
+        _jspx_page_context.forward("login.jsp");
+        return;
+      }
+      out.write("\n");
+      out.write("        ");
+
+//                    <!--response.sendRedirect("login.jsp");-->
+                }
+                else{
+                    session.setAttribute("mid",name);
+                }
             }
             
             
+            cont=DAOFactory.getIProductDAOInstance().getAll();
+            count=cont.size();
+
         
       out.write("\n");
       out.write("        \n");
@@ -215,18 +183,13 @@ public final class purchase_jsp extends org.apache.jasper.runtime.HttpJspBase
             {
                 after=npage+1;
             }
-            System.out.println("npage:"+npage);
-            System.out.println("start:"+start);
-            System.out.println("end:"+end);
-            System.out.println("after:"+after);
-            System.out.println("count:"+count);
-           
-
         
       out.write("\n");
+      out.write("        \n");
       out.write("        <div style=\"width:100%;height:80%;\">\n");
       out.write("         <table>\n");
       out.write("            <tr>\n");
+      out.write("                <td>商品参考</td>\n");
       out.write("                <td>\n");
       out.write("                    商品id\n");
       out.write("                </td>\n");
@@ -260,7 +223,7 @@ public final class purchase_jsp extends org.apache.jasper.runtime.HttpJspBase
                 {
                     break;
                 }
-                goods np=cont.get(npage*5+ncount);
+                Product np=cont.get(npage*5+ncount);
                 
                  System.out.println("ncount:"+ncount);
                  ncount++;
@@ -269,8 +232,11 @@ public final class purchase_jsp extends org.apache.jasper.runtime.HttpJspBase
       out.write("\n");
       out.write("       \n");
       out.write("            <tr>\n");
+      out.write("                <td><img src=\"");
+      out.print(np.photo);
+      out.write("\" style=\"height:150px;width:200px;\"></td>\n");
       out.write("                <td>");
-      out.print(np.id);
+      out.print(np.pid);
       out.write("</td>\n");
       out.write("                <td>");
       out.print(np.name);
@@ -285,7 +251,7 @@ public final class purchase_jsp extends org.apache.jasper.runtime.HttpJspBase
       out.print(np.amount);
       out.write("</td>\n");
       out.write("                <td><a style=\"float:right;\" href=\"purchase.jsp?item=");
-      out.print(np.id);
+      out.print(np.pid);
       out.write("&tpage=");
       out.print(npage);
       out.write("\">加入购物车</a></td>\n");

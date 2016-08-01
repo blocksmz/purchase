@@ -4,7 +4,7 @@ import javax.servlet.*;
 import javax.servlet.http.*;
 import javax.servlet.jsp.*;
 
-public final class login_jsp extends org.apache.jasper.runtime.HttpJspBase
+public final class test_jsp extends org.apache.jasper.runtime.HttpJspBase
     implements org.apache.jasper.runtime.JspSourceDependent {
 
   private static final JspFactory _jspxFactory = JspFactory.getDefaultFactory();
@@ -48,40 +48,14 @@ public final class login_jsp extends org.apache.jasper.runtime.HttpJspBase
       out.write("<html>\n");
       out.write("    <head>\n");
       out.write("        <meta http-equiv=\"Content-Type\" content=\"text/html; charset=UTF-8\">\n");
-      out.write("        <title>登录</title>\n");
+      out.write("        <title>JSP Page</title>\n");
       out.write("    </head>\n");
       out.write("    <body>\n");
-      out.write("        \n");
       out.write("        ");
 
-            request.setCharacterEncoding("utf-8");
-        
+            response.sendRedirect("login.jsp");
+            
       out.write("\n");
-      out.write("    <center>\n");
-      out.write("        <form action=\"purchase.jsp\" method=\"post\">\n");
-      out.write("            <table>\n");
-      out.write("                <tr>\n");
-      out.write("                    <td>\n");
-      out.write("                        用户名：\n");
-      out.write("                    </td>\n");
-      out.write("                    <td>\n");
-      out.write("                        <input type=\"text\" name=\"uname\">    \n");
-      out.write("                    </td>\n");
-      out.write("                </tr>\n");
-      out.write("                <tr>\n");
-      out.write("                    <td>\n");
-      out.write("                        密码：\n");
-      out.write("                    </td>\n");
-      out.write("                    <td>\n");
-      out.write("                        <input type=\"text\" name=\"upass\">\n");
-      out.write("                    </td>\n");
-      out.write("                </tr>\n");
-      out.write("                 </table>    \n");
-      out.write("                        <input type=\"submit\" value=\"登录\">\n");
-      out.write("\n");
-      out.write("                        <input type=\"reset\" value=\"重置\">\n");
-      out.write("        </form>\n");
-      out.write("    </center>\n");
       out.write("    </body>\n");
       out.write("</html>\n");
     } catch (Throwable t) {
